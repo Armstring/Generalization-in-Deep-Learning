@@ -1,0 +1,613 @@
+% Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
+%
+% In principle, this file can be redistributed and/or modified under
+% the terms of the GNU Public License, version 2.
+%
+% However, this file is supposed to be a template to be modified
+% for your own needs. For this reason, if you use this file as a
+% template and not specifically distribute it as part of a another
+% package/program, I grant the extra permission to freely copy and
+% modify this file as you see fit and even to delete this copyright
+% notice. 
+
+\documentclass[13pt]{beamer}
+%\documentclass[13pt]{beamer}
+
+\title{A Brief Introduction to Generalization in Deep Learning}
+\author{Kry Lui \& Ruitong Huang}
+%\\
+%joint work with  and }
+\institute{Borealis AI}
+\date{  } 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+%\titlegraphic{ 
+%\includegraphics[height=10mm]{logo} \hspace{5pt}
+%}
+
+%\pgfdeclareimage[height=0.5cm]{university-logo}{logo}
+%\logo{\pgfuseimage{university-logo}}
+
+% There are many different themes available for Beamer. A comprehensive
+% list with examples is given here:
+% http://deic.uab.es/~iblanes/beamer_gallery/index_by_theme.html
+% You can uncomment the themes below if you would like to use a different
+% one:
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+\usetheme{Boadilla}
+%\usetheme{boxes}
+%\usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{default}
+%\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+%\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+%%%%%%% Author defined area %%%%%%%%%%%%
+
+%%%%%%%%%%%%%% TODOs %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{color}
+%\usepackage[usenames,dvipsnames]{xcolor}
+
+\setbeamerfont{frametitle}{size=\large}
+
+
+\usepackage[absolute,overlay]{textpos}
+%%%%
+% note: beamer slides are 128mm by 96 mm
+\newcommand{\putatUL}[4]{ % width xpos ypos WHAT; upper left corner is put at the said pos
+\begin{textblock*}{#1}[0,0](#2,#3)
+#4
+ \end{textblock*}
+}
+\newcommand{\putatUR}[4]{ % width xpos ypos WHAT; upper right corner is put at the said pos
+\begin{textblock*}{#1}[1,0](#2,#3)
+#4
+ \end{textblock*}
+ }
+\newcommand{\putatUM}[4]{ % width xpos ypos WHAT; upper right corner is put at the said pos
+\begin{textblock*}{#1}[0.5,0](#2,#3)
+#4
+ \end{textblock*}
+ }
+\newcommand{\putatBR}[4]{ % width xpos ypos WHAT; bottom right corner is put at the said pos
+\begin{textblock*}{#1}[1,1](#2,#3)
+#4
+ \end{textblock*}
+}
+\newcommand{\putatBL}[4]{ % width xpos ypos WHAT; bottom left corner is put at the said pos
+\begin{textblock*}{#1}[0,1](#2,#3)
+#4
+ \end{textblock*}
+}
+\newcommand{\putatBM}[4]{ % width xpos ypos WHAT; bottom left corner is put at the said pos
+\begin{textblock*}{#1}[0.5,1](#2,#3)
+#4
+ \end{textblock*}
+}
+ \newcommand{\putatMID}[4]{ % width xpos ypos WHAT; mid of image is put at the said pos
+\begin{textblock*}{#1}[0.5,0.5](#2,#3)
+#4
+ \end{textblock*}
+ }
+
+\newcommand{\putat}[3]{\begin{picture}(0,0)(0,0)\put(#1,#2){#3}\end{picture}} % xrelpos yrelpos WHAT
+
+\newcommand{\bcol}[1][t]{\begin{columns}[#1]} % optional argument: alignment (t,b,c)
+\newcommand{\ecol}{\end{columns}}
+\newcommand{\col}[1][0.5\textwidth]{\column{#1}} % argument: width of the column
+
+
+%%%%%
+\usepackage{tikz}
+\usetikzlibrary{calc,shapes.callouts,shapes.arrows}
+
+% Usage example:
+% \arrowthis{There is}{Corot} a\speechthis{beautiful flower}{Van Gogh}\bubblethis{in}{Matisse}\pointthis{the garden}{Monet}.        
+%
+% From: http://tex.stackexchange.com/questions/38805/simple-speech-bubbles-arrows-or-balloon-like-shapes-in-beamer        
+
+\newcommand{\arrowthis}[2]{
+        \tikz[remember picture,baseline]{\node[anchor=base,inner sep=0,outer sep=0]%
+        (#1) {{#1}};
+        \node[overlay,single arrow,draw=none,fill=red!50,anchor=tip,rotate=60] 
+        at (#1.south) {#2};}%
+    }%
+
+\newcommand{\speechthis}[2]{
+        \tikz[remember picture,baseline]{\node[anchor=base,inner sep=0,outer sep=0]%
+        (#1) {{#1}};\node[overlay,ellipse callout,fill=blue!50] 
+        at ($(#1.north)+(-.5cm,0.8cm)$) {#2};}%
+    }%
+
+\newcommand{\bubblethis}[2]{
+        \tikz[remember picture,baseline]{\node[anchor=base,inner sep=0,outer sep=0]%
+        (#1) {{#1}};\node[overlay,cloud callout,callout relative pointer={(-0.6cm,-0.7cm)},%
+        aspect=2.5,fill=yellow!90] at ($(#1.north)+(2.5cm,1.6cm)$) {#2};}%
+    }%
+
+\newcommand{\pointthis}[2]{
+        \tikz[remember picture,baseline]{\node[anchor=base,inner sep=0,outer sep=0]%
+        (#1) {{#1}};\node[overlay,rectangle callout,%
+        callout relative pointer={(0.2cm,0.7cm)},fill=green!50] at ($(#1.north)+(-.5cm,-1.4cm)$) {#2};}%
+        }%
+        
+\newcommand{\leftpointthis}[2]{
+        \tikz[remember picture,baseline]{\node[anchor=base,inner sep=0,outer sep=0]%
+        (#1) {{#1}};\node[overlay,rectangle callout,%
+        callout relative pointer={(0.2cm,0.7cm)},fill=green!50] at ($(#1.north)+(-.5cm,-1.4cm)$) {#2};}%
+        }%
+
+\newcommand{\rightpointthis}[2]{
+        \tikz[remember picture,baseline]{\node[anchor=base,inner sep=0,outer sep=0]%
+        (#1) {{#1}};\node[overlay,rectangle callout,%
+        callout relative pointer={(-0.3cm,0.7cm)},fill=green] at ($(#1.north)+(.5cm,-1.4cm)$) {#2};}%
+        }%        
+%%%%%%%        
+
+\renewcommand<>{\cancel}[1]{\alt#2{\beameroriginal{\cancel}{#1}}{#1}}
+
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamercolor{math text}{fg=blue!50!normal text.fg}
+
+\usepackage{multimedia}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage{xspace}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage[round]{natbib}
+\usepackage{xspace}
+\usepackage{multicol}
+\newcommand\Fontvi{\fontsize{6}{7.2}\selectfont}
+\usepackage{amstext}
+\usepackage{esvect}
+
+%\usepackage{rotating}
+\usepackage{ulem}
+
+
+
+\allowdisplaybreaks
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cG}{\mathcal{G}}
+
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\cZ}{\mathcal{Z}}
+
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\tcF}{\widetilde{\cF}}
+\newcommand{\Exp}[1]{\mathbb{E}\left[ #1 \right]} 
+\newcommand{\ind}{\mathbb{I}}
+\newcommand{\one}[1]{\ind\left(#1\right)}
+\newcommand{\seto}[1]{\left\{#1\right\}}
+
+\newcommand{\eps}{\epsilon}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\bS}{\mathbb{S}}
+\newcommand{\inpro}[2]{\langle #1, #2\rangle}
+\newcommand{\inprol}[2]{\left\langle #1, #2\right\rangle}
+\newcommand{\ip}[1]{\langle#1\rangle}
+\newcommand{\set}[2]{\left\{#1 \,:\, #2 \right\}}
+%\newcommand{\set}[2]{\left\{#1 \,\vert\, #2 \right\}}
+\newcommand{\lt}{\ell_t}
+\newcommand{\ttheta}{\tilde{\theta}}
+\newcommand{\wtheta}{\widehat{\theta}}
+\newcommand{\htheta}{\hat{\theta}}
+\newcommand{\what}[1]{\widehat{#1}}
+\newcommand{\tw}{\tilde{w}}
+\newcommand{\hf}{\hat{f}}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+\newcommand{\bd}{\mathrm{bd}}
+\newcommand{\inangle}[2]{(#1,#2)}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand{\uD}{\overline{D}}
+\newcommand{\lD}{\underline{D}}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\eg}{\text{e.g. }}
+\newcommand{\Prob}[1]{\mbox{Prob}\left(#1\right)}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator{\dom}{dom}
+\DeclareMathOperator{\epi}{epi}
+\usepackage[capitalize]{cleveref}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+\newcommand{\uX}{\underline{X}}
+\newcommand{\uY}{\underline{Y}}
+\newcommand{\uZ}{\underline{Z}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\mI}{\mathbb{I}}
+\newcommand{\real}{\mathbb{{R}}}
+
+\newcommand{\VC}{\text{VC}}
+
+\newcommand{\EEp}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\Grank}{\rho}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\Probp}[1]{\mathbb{P}\left(#1\right)}
+\newcommand{\hlmin}{\hat{\lambda}_{\min}}
+\newcommand{\ghn}{g_{h,n}}
+\newcommand{\oL}{\overline{L}}
+%\newtheorem{thm}{Theorem}[section]
+%\newtheorem{lemma}[thm]{Lemma}
+%\newtheorem{prop}[thm]{Proposition}
+%\newtheorem{cor}[thm]{Corollary}
+%%\newtheorem{comm}[thm]{Comment}
+%\newtheorem{example}[thm]{Example}
+%\newtheorem{remark}[thm]{Remark}
+
+\linespread{1.3}
+
+\setbeamertemplate{footnote}{%
+  \parindent 0em\noindent%
+  \raggedleft%\raggedright
+  \usebeamercolor{footnote}\hbox to 0.8em{\hfil\insertfootnotemark}\insertfootnotetext\par%
+}
+
+\let\svthefootnote\thefootnote
+\textheight 1in
+\newcommand\blankfootnote[1]{%
+  \let\thefootnote\relax\footnotetext{#1}%
+  \let\thefootnote\svthefootnote%
+}
+
+\newcommand{\chapternote}[1]{{%
+		\let\thempfn\relax% Remove footnote number printing mechanism
+		\footnotetext[0]{{#1}}% Print footnote text
+}}
+
+\usepackage{array}
+\usepackage{multirow}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\setbeamertemplate{footline}{}
+%\setbeamertemplate{navigation symbols}{}
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection]
+%  \end{frame}
+%}
+
+% Let's get started
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%\begin{frame}{Outline}
+%  \tableofcontents
+%  % You might wish to add the option [pausesections]
+%\end{frame}
+
+% Section and subsections will appear in the presentation overview
+% and table of contents.
+
+\newcommand{\bin}{\begin{itemize}}
+\newcommand{\bi}{\begin{itemize}[<+->]}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{frame}{Outline}
+\begin{itemize}
+\item Introduction
+\begin{itemize}
+	\item Uniform Convergence
+	\item Stability 
+\end{itemize}
+\item Rademacher Complexity and Generalization
+\item Information Bottleneck and Generalization 
+\item Stability and Generalization
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Generalization Bounds}
+Goal: We try to relate the training error to the true error (test error).
+\[
+G_m = \EEp{\ell(h(\,\cdot\,; w_m),z)} - \frac{1}{m} \sum_i \ell\left(h(\, \cdot \,; w_m), z_i\right)
+\]
+Notations: 
+\bi
+	\item $z_1, \ldots, z_m$ training samples of size $m$; $z_i = (x_i, y_i) \in \cX \times \{-1,1\}$;
+	\item $\ell$ loss function; $h$ the model;
+	\item $w$ parameter; \\
+	$w_m$ parameter learned from the training sample; \\
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Background:
+\begin{itemize}
+	\item Hoeffding‘s Inequality:\\
+$X \in [a, b]$ and let  $r = b-a$. Observations of $X$: $\{X_1, \cdot, X_m\}$. $\bar{X}$ average of the observations. 
+\[
+\Probp{\bar{X} \ge \mu + \epsilon} \le e^{-2m\epsilon^2/r^2} \quad \text{for any } \epsilon\ge 0,
+\]
+or, with probability at least $1-\delta$,
+\[
+\bar{X} \le \mu + r\sqrt{\frac{\log(1/\delta)}{2m}}.
+\]
+\item Other concentration inequalities: Bernstein's inequality, Mcdiarmid's inequality etc.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\bi
+	\item Simply apply to the training loss! 
+	\item $\ell(h(\,\cdot\,),Z)$ is a random variable for a fixed $\ell$ and $h$.
+	\item For a fixed $h: \cX \rightarrow \cY$, and $\ell: \cY\times \cY \rightarrow [0,1]$, let $U = \ell(h(\,X\,), Y)$ is a random variable in $[0,1]$.
+	\item With probability at least $1-\delta$, 
+	\[
+	\EEp{\ell(h(\,\cdot\,; w),z)} \le  \frac{1}{m} \sum_i \ell\left(h(\, \cdot \,; w), z_i\right) + r\sqrt{\frac{\log(1/\delta)}{2m}}. 
+	\]
+\end{itemize}
+
+\pause
+\centering
+Good?
+\bi
+\item Only true for a $h$ that is independent to the training samples;
+\item Not true for $h(\,\cdot\,; w_m)$;
+\item Because $w_m$ is a function of $\{Z_1, \ldots, Z_m\}$.
+\ei
+\end{frame}
+
+
+\begin{frame}{Uniform Convergence}
+\begin{align*}
+	& \quad \EEp{\ell(h(\,\cdot\,; w_m),z)} -  \frac{1}{m} \sum_i \ell\left(h(\, \cdot \,; w_m), z_i\right) \\
+	& \le \sup_{w\in\cW} \left| \EEp{\ell(h(\,\cdot\,; w),z)} -  \frac{1}{m} \sum_i \ell\left(h(\, \cdot \,; w), z_i\right)
+	\right|
+\end{align*}
+\pause
+So we only need to know
+\[
+\Probp{\sup_{w\in\cW} \left| \EEp{\ell(h(\,\cdot\,; w),z)} -  \frac{1}{m} \sum_i \ell\left(h(\, \cdot \,; w), z_i\right)
+	\right| \ge \epsilon } \le \, ?
+\]
+\pause 
+Call this event $\cE_{w}$. If $\cW$ is finite $\{w_1, \ldots, w_K\}$, then
+\[
+\Probp{\cE_{w_1}} \le e^{-2m\epsilon^2/r^2}; \Probp{\cE_{w_2}} \le e^{-2m\epsilon^2/r^2}; ...
+\]
+Therefore, 
+\[
+\Probp{\cE_{w_1}, \cE_{w_2}, \ldots, \cE_{w_K}} \le Ke^{-2m\epsilon^2/r^2}.
+\]
+\end{frame}
+
+
+\begin{frame}{Uniform Convergence}
+\[
+\Probp{\cE_{w_1}, \cE_{w_2}, \ldots, \cE_{w_K}} \le Ke^{-2m\epsilon^2/r^2}.
+\]
+\bi
+\item Generalization error $G_m$ is less than $ r\sqrt{\frac{\log(K/\delta)}{m}}$ with probability at least $1-\delta$.\\
+\item What if $\cW$ is not finite? 
+\item VC dimension;\\
+Consider the set $\cF = \{ \ell(h(\,\cdot\,; w)) \vert w\in\cW\}$. The VC dimension of $\cF$, $\VC(\cF)$ is "the number of points that can always be correctly classified by some $f\in\cF$ for any labels".
+\[
+G_m \le r\sqrt{\frac{\VC(\cF) \log (m/\VC(\cF)) + \log(1/\delta)}{m}}.
+\]
+\vspace{-0.7cm}
+\item Other measures: Covering number; Rademacher Complexity.
+\ei
+\end{frame}
+
+\begin{frame}{Uniform Convergence}
+Rademacher Complexity;
+\bi
+\item Given $\{Z_1, \ldots, Z_n\}$
+\[ 
+R_n(\cF) = \frac{1}{n} \EEp{\sup_{f\in\cF} \sum_i \epsilon_i f(Z_i)},
+\]
+where $\epsilon_i$ is the Bernoulli random variable on $\{\pm 1\}$.
+\item How good $\cF$ can fit randomized labels.
+\item 
+\[
+G_m \le 2R_m(\cF) + \sqrt{\frac{2\log(1/\delta)}{m}}.
+\]
+\item Generalization error can be bounded, given small capacity of $\cF$.
+\ei
+\end{frame}
+
+
+\section{Current Results}
+
+\begin{frame}{}
+
+\centering   
+{\huge Generalization in Deep Learning}
+\vspace{1cm}
+\begin{itemize}
+	\item Uniform convergence
+	\item Information theory
+	\item Stability
+	\item Robustness
+	\item PAC-Bayesian
+\end{itemize}
+\end{frame}
+\begin{frame}{Paper I: }
+\emph{Understanding deep learning requires rethinking generalization};\\
+
+\bi
+	\item SGD with Neural networks generalizes well on the original dataset: $0$ training error and 'small' test error;
+	\item But it does not generalize, if we replace the labels by independently randomized labels: $0$ training error, but $50\%$ test error;
+	\item 
+	\[
+	R_m(\cF) = \frac{1}{m} \EEp{\sup_{f\in\cF} \sum_i \epsilon_i f(Z_i)} = 1!
+	\]
+	So 
+	\[
+	\Probp{\text{misclassification}} \le 1 + \sqrt{\frac{1}{m}}. 
+	\]
+\ei
+\end{frame}
+
+\if0
+
+
+\begin{frame}{Stability}
+\bi
+\item Uniform Stability: Given training set $S = \{Z_1, \ldots, Z_m\}$ and $\{Z'_1, \ldots, Z'_m\}$, denote $S^{i}$ be the set when $Z_i$ in $S$ is replaced by $Z'_i$.  Algorithm $A$ has uniform stability $\beta$, if 
+\[
+\forall S, \forall i, \quad \| \ell(A_S,\,\cdot\,) - \ell(A_{S^{i}},\,\cdot\,)\|_{\infty} \le \beta
+\]
+\item Generalization Bound; With probability at least $1-\delta$,
+\[
+G_m \le O(\beta + \sqrt{m\log(1/\delta)}\beta )
+\]
+\item $\beta$ is usually in the scale of $\frac{1}{m}$. 
+\ei
+\end{frame}
+
+\begin{frame}{Paper II: }
+\emph{Generalizatino in Deep Learning};\\
+\bi
+\item Proposition 2 in the paper: Under common assumptions, and assume that $\cF$ is finite, then given a "validation" set $\{Z_1, \ldots, Z_m\}$,
+\[
+\text{True Loss } - \underbrace{\frac{1}{m}\sum_i \ell(h(\,\cdot\,; w_m), Z_i)}_{\text{validation error}} = O\left( \sqrt{\frac{\log(\vert \cF  \vert)}{m}}\right).
+\]
+\item The tricky part: Training error is a "biased" estimate of the true error;\\
+\pause
+The "concentrated dataset" assumption is assumed that this bias is not large...
+\item How insightful/reasonable the "concentrated dataset" assumption is?
+\item Still relies on the "capacity" of 
+\ei
+\end{frame}
+
+\begin{frame}{Paper III: }
+\emph{Train faster, Generalize better: Stability of SGD};\\
+\bi
+\item Use the stability analysis for the SGD algorithm;
+\item 
+\ei
+
+
+\end{frame}
+
+\begin{frame}{Paper IV: Tishby et al.}
+
+
+
+\end{frame}
+\fi
+
+
+
+\begin{frame}
+\centering
+{\large  Tishby's Information Bottleneck Idea}
+\end{frame}
+\begin{frame}{Terminologies and bounds}{}
+\begin{itemize}
+	\item { 
+		Generalization error: $\epsilon^2 = (L(h) - L(\hat{h}))^2$ }
+	
+	\item {
+		Confidence for probabilistic bound: $\delta$ }
+	
+	\item {number of training samples: m }
+	
+	\item {$\epsilon$-cover of the hypothesis space of functions: $H_{\epsilon}$. If we consider the space of all functions and $m$ data points, then $H_{\epsilon} \sim (\frac{1}{\epsilon})^m $}
+	
+	\item{ Classical PAC bound: $\epsilon^2 < \frac{ \log(|H_{\epsilon}|) + 1/\delta }{2m} $ }
+	
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Cover the input space via an approximate minimal sufficient statistics T}
+
+\begin{itemize}
+\item { The size of the $\epsilon$ uniform covering of the function space prevents us from explaining generalization in deep learning. The space of functions considered by deep learning may well be much smaller. 
+	% Let us try to shift paradigm to reduce its size. 
+}
+
+\item { For simplicity, let us consider binary classification. Then the space of functions defined on it is highly related to how the domain is cut.  $| H | \sim 2^{|X|} $ and $| H_{\epsilon} | \sim 2^{|X_{\epsilon}|} $ }
+
+\item { Consider an approximate minimal sufficient statistics $T$ that minimizes $I(T, X)$ and maximizes $I(T, Y)$. Say a hidden layer that tries to preserve information about the output $Y$ and only learn just enough information about $X$ to do it. }
+
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}{Reduce Hypotheses Space}
+
+\begin{itemize}
+\item { $\epsilon$ cover the codomain of $T(X)$, consider its induced $\epsilon$ partition of the domain! $|H_{T^{\epsilon}}| \sim 2^{|T_{\epsilon}^{-1}|} = 2^{|T_{\epsilon}|} $
+}
+
+\item { It remains to estimate the size of $|T_{\epsilon}|$ which is the number of  hypotheses in $X$. }
+
+\item { The number of distinct fibers (inverse images) of $T$ is the size of $X$ divided by average fiber size. Tishby argues this can be deduced from information theory. }
+
+\item { $|X| \sim 2^{H(X)}$, average fiber size $ \sim 2^{H(X|T_{\epsilon})} $, so $|T_{\epsilon}| \sim \frac{2^{H(X)}}{2^{H(X|T_{\epsilon})}} = 2^{I(X, T_{\epsilon})} $ }        
+
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Information theoretic PAC}
+
+\begin{itemize}
+\item{ New PAC bound: $\epsilon^2 < \frac{ 2^{I(X, T_{\epsilon})} + 1/\delta }{2m} $ }
+
+\item{ If $T_{\epsilon}$ is an approximate minimal sufficient statistics about $Y$, then  $I(X, T_{\epsilon})$ should be fairly small, since most information in $X$ is irrelevant for $Y$. }
+
+\end{itemize}
+
+\end{frame}
+
+\end{document}
+
+
+
+
